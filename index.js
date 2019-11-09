@@ -38,7 +38,7 @@ calcAvailableDistance = (myPosition) => {
 
 isLastEnemy = () => enemyPosition.length === 1;
 
-findDeersInSector = (number) => {
+findDeersInSector = (number, hunt) => {
   let deersInSector = enemyPosition
       .map(enemy => {
         if (Math.abs(myPosition.x - enemy.position.x) <= number && Math.abs(myPosition.y - enemy.position.y) <= number) {
@@ -84,6 +84,78 @@ searchPlace = (hunters, x, y) => {
   });
 }
 
+
+createHunterMatrix = (x, y) => {
+  let temp = [
+    [x - 2, y - 2],
+    [x - 1, y - 2],
+    [x, y - 2],
+    [x + 1, y - 2],
+    [x + 2, y - 2],
+
+    [x - 2, y - 1],
+    [x - 1, y - 1],
+    [x, y - 1],
+    [x + 1, y - 1],
+    [x + 2, y - 1],
+
+    [x - 2, y],
+    [x - 1, y],
+    [x, y],
+    [x + 1, y],
+    [x + 2, y],
+
+    [x - 2, y + 1],
+    [x - 1, y + 1],
+    [x, y + 1],
+    [x + 1, y + 1]
+    [x + 2, y + 1],
+
+    [x - 2, y + 2],
+    [x - 2, y + 2],
+    [x, y + 2],
+    [x + 1, y + 2],
+    [x + 1, y + 2]
+  ]
+      .map((coord) => ((coord[0] > 0 && coord[1] > 0 && coord[0] < arenaSize && coord[1] < arenaSize) ? coord : false))
+      .filter((coord) => !!coord)
+}
+//  Матрица возможных движений
+createMatrix = (x, y) => {
+  let temp = [
+      [x - 1, y - 1],
+      [x, y - 1],
+      [x + 1, y - 1],
+
+      [x - 1, y],
+      [x, y],
+      [x + 1, y],
+
+      [x - 1, y + 1],
+      [x, y + 1],
+      [x + 1, y + 1]
+  ]
+      .map((coord) => ((coord[0] > 0 && coord[1] > 0 && coord[0] < arenaSize && coord[1] < arenaSize) ? coord : false))
+      .filter((coord) => !!coord)
+}
+
+filterMatrix = (matrix, hunters) => {
+  let hunterMatrix = hunters.map((hunter) => createHunterMatrix(hunter[0], hunter[1]));
+  matrix
+      .filter((coord) => {
+        let result = true;
+        hunterMatrix.forEach((hunter) => {
+          hunter.forEach((hunterCoords) => {
+            if (hunterCoords[0] == coord[0] && hunterCoords[1] == coord[1]) {
+              result = false;
+            }
+          })
+        });
+        return result;
+      });
+  return matrix;
+}
+
 // searchPlace = (hunters, x, y) => {
 //   // return [
 //   //     hunters.map((enemy) => (enemy.x + 2 === x || enemy.x - 2 === x ? x )),
@@ -99,7 +171,7 @@ makeHunt = () => {
   y =  myPosition.y;
 
   let sector = calcAvailableDistance(myPosition);
-  let deers = findDeersInSector(1);
+  let deers = findDeersInSector(API.getActionPointsCount() > 2 ? 2 : 1);
   let hunters = findDeersInSector(2);
 
   if (deers) {
@@ -110,32 +182,38 @@ makeHunt = () => {
   } else if (hunters) {
     if (!lastEnemy) {
       // еще есть
-
       let lastX  =  x;
       let lastY =  y;
-      x = makeRand(x);
-      y = makeRand(y);
-      while (x === lastX && y === lastY) {
-        x = makeRand(x);
-        y  = makeRand(y);
+      let matrix = createMatrix(lastX, lastY);
+      matrix = filterMatrix(filterMatrix, hunters);
+      let randomMatrix = matrix[Math.floor(Math.random()*matrix.length)];
+      if (matrix.length > 0) {
+        x = randomMatrix[0];
+        y = randomMatrix[1];
+      } else {
+        x  = matrix[0];
+        y = matrix[1];
       }
     } else {
-      let temp  = searchPlace(hunters, x, y)
-      x = temp[0];
-      y = temp[1];
-      // Последний враг
-      // попытка найти безопасное место
-      // if(latestPositionY === null) {
-      //   latestPositionY = enemyPosition[0].position.y;
-      //   latestPositionX = enemyPosition[0].position.x;
-      //   x = myPosition.x;
-      //   y = myPosition.y;
-      // } else {
-      //   let t1 = makeRand(x);
-      //   let t2 = makeRand(y);
-      //   x = Math.abs(t1 - myPosition.x) == 1 ? : t1;
-      //   y = Math.abs(t2 - myPosition.y) == 1 ? : t2;
-      // }
+      let lastX  =  x;
+      let lastY =  y;
+      let matrix = createMatrix(lastX, lastY);
+      matrix = filterMatrix(filterMatrix, hunters);
+      let randomMatrix = matrix[Math.floor(Math.random()*matrix.length)];
+      if (matrix.length > 0) {
+        // ищем ближайший
+        matrix = matrix.sort((a, b) => {
+          if (Math.abs(a[0] - lastX) < Math.abs(b[0] - lastX) && Math.abs(a[1] - lastY) < Math.abs(b[1] - lastY)) {
+            return -1
+          } else {}
+            return 1;
+        })
+        x  = matrix[0];
+        y = matrix[1];
+      } else {
+        x  = matrix[0];
+        y = matrix[1];
+      }
     }
   } else {
       let lastX  =  x;
