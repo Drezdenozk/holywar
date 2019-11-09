@@ -10,6 +10,7 @@ class Arena {
 
     try {
       const filePath = `${__dirname}/${bot}`;
+      console.warn(`${__dirname}/${bot}`)
       this.source = fs.readFileSync(filePath);
     } catch (err) {
       console.error('Usage: node arena.js index.js');

@@ -67,6 +67,29 @@ makeRand = (val) => {
   return num;
 }
 
+searchPlace = (hunters, x, y) => {
+  return hunters.map((enemy) => {
+    let arr = [];
+    if (x < enemy.x) {
+      arr.push(x -  1 > 0 ? x - 1 : x);
+    } else {
+      arr.push(x + 1 < arenaSize ? x + 1  : x);
+    }
+    if (y < enemy.y) {
+      arr.push(y - 1 > 0 ? y - 1 : y);
+    } else {
+      arr.push(y + 1 < arenaSize ? y + 1 : y);
+    }
+    return arr;
+  });
+}
+
+// searchPlace = (hunters, x, y) => {
+//   // return [
+//   //     hunters.map((enemy) => (enemy.x + 2 === x || enemy.x - 2 === x ? x )),
+//   //     hunters.map((enemy) => enemy.y)]
+//   // ];
+// }
 makeHunt = () => {
   myPosition = API.getCurrentPosition(); // { x: number, y: number}
   enemyPosition = API.getEnemies(); // [{position: {x: number, y:number}]
@@ -86,9 +109,22 @@ makeHunt = () => {
     }
   } else if (hunters) {
     if (!lastEnemy) {
-      x = myPosition.x;
-      y = myPosition.y;
+      // еще есть
+
+      let lastX  =  x;
+      let lastY =  y;
+      x = makeRand(x);
+      y = makeRand(y);
+      while (x === lastX && y === lastY) {
+        x = makeRand(x);
+        y  = makeRand(y);
+      }
     } else {
+      let temp  = searchPlace(hunters, x, y)
+      x = temp[0];
+      y = temp[1];
+      // Последний враг
+      // попытка найти безопасное место
       // if(latestPositionY === null) {
       //   latestPositionY = enemyPosition[0].position.y;
       //   latestPositionX = enemyPosition[0].position.x;
@@ -100,12 +136,16 @@ makeHunt = () => {
       //   x = Math.abs(t1 - myPosition.x) == 1 ? : t1;
       //   y = Math.abs(t2 - myPosition.y) == 1 ? : t2;
       // }
-      x = myPosition.x;
-      y = myPosition.y;
     }
   } else {
+      let lastX  =  x;
+      let lastY =  y;
       x = makeRand(x);
       y = makeRand(y);
+      while (x === lastX && y === lastY) {
+        x = makeRand(x);
+        y  = makeRand(y);
+      }
   }
   API.move(x, y);
 }
