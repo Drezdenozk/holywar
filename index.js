@@ -1,9 +1,39 @@
+const arenaSize = API.getArenaSize(); // number
 let myPosition = API.getCurrentPosition(); // { x: number, y: number}
 let enemyPosition = API.getEnemies(); // [{position: {x: number, y:number}]
-const arenaSize = API.getArenaSize(); // number
-
 let x = myPosition.x;
 let y =  myPosition.y;
+let points = API.getActionPointsCount();
+//
+// createMatrix = (x, y) => {
+//   let temp = [
+//       [x - 1, y - 1],
+//       [x, y - 1],
+//       [x + 1, y - 1],
+//       [x - 1, y],
+//       [x, y],
+//       [x + 1, y],
+//       [x - 1, y + 1],
+//       [x, y + 1],
+//       [x + 1, y + 1]
+//   ]
+//       .map((coord) => ((coord[0] > 0 && coord[1] > 0 && coord[0] < arenaSize && coord[1] < arenaSize) ? coord : false))
+//       .filter((coord) => !!coord)
+// }
+//
+// makeHunt = () => {
+//   myPosition = API.getCurrentPosition(); // { x: number, y: number}
+//   enemyPosition = API.getEnemies(); // [{position: {x: number, y:number}]
+//   points = API.getActionPointsCount();
+//   x = myPosition.x;
+//   y = myPosition.y;
+//
+//   let createMoveMatrix(myPosition)
+//
+//   let deers = findDeersInSector(API.getActionPointsCount() > 2 ? 2 : 1);
+//   let hunters = findDeersInSector(3);
+// }
+
 
 let lastEnemy = false;
 latestPositionX = null;
@@ -86,31 +116,27 @@ searchPlace = (hunters, x, y) => {
 
 
 createHunterMatrix = (x, y) => {
-  let temp = [
+  return [
     [x - 2, y - 2],
     [x - 1, y - 2],
     [x, y - 2],
     [x + 1, y - 2],
     [x + 2, y - 2],
-
     [x - 2, y - 1],
     [x - 1, y - 1],
     [x, y - 1],
     [x + 1, y - 1],
     [x + 2, y - 1],
-
     [x - 2, y],
     [x - 1, y],
     [x, y],
     [x + 1, y],
     [x + 2, y],
-
     [x - 2, y + 1],
     [x - 1, y + 1],
     [x, y + 1],
     [x + 1, y + 1]
     [x + 2, y + 1],
-
     [x - 2, y + 2],
     [x - 2, y + 2],
     [x, y + 2],
@@ -122,15 +148,13 @@ createHunterMatrix = (x, y) => {
 }
 //  Матрица возможных движений
 createMatrix = (x, y) => {
-  let temp = [
+  return [
       [x - 1, y - 1],
       [x, y - 1],
       [x + 1, y - 1],
-
       [x - 1, y],
       [x, y],
       [x + 1, y],
-
       [x - 1, y + 1],
       [x, y + 1],
       [x + 1, y + 1]
@@ -156,12 +180,6 @@ filterMatrix = (matrix, hunters) => {
   return matrix;
 }
 
-// searchPlace = (hunters, x, y) => {
-//   // return [
-//   //     hunters.map((enemy) => (enemy.x + 2 === x || enemy.x - 2 === x ? x )),
-//   //     hunters.map((enemy) => enemy.y)]
-//   // ];
-// }
 makeHunt = () => {
   myPosition = API.getCurrentPosition(); // { x: number, y: number}
   enemyPosition = API.getEnemies(); // [{position: {x: number, y:number}]
@@ -170,9 +188,8 @@ makeHunt = () => {
   x = myPosition.x;
   y =  myPosition.y;
 
-  let sector = calcAvailableDistance(myPosition);
   let deers = findDeersInSector(API.getActionPointsCount() > 2 ? 2 : 1);
-  let hunters = findDeersInSector(2);
+  let hunters = findDeersInSector(3);
 
   if (deers) {
     if (deers.length) {
