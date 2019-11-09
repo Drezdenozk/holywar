@@ -189,7 +189,7 @@ makeHunt = () => {
   y =  myPosition.y;
 
   let deers = findDeersInSector(API.getActionPointsCount() > 2 ? 2 : 1);
-  let hunters = findDeersInSector(3);
+  let hunters = findDeersInSector(2);
 
   if (deers) {
     if (deers.length) {
